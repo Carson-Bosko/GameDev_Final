@@ -227,17 +227,17 @@ public class Entity : MonoBehaviour {
         float angle = Mathf.Atan2(newFacing.y, newFacing.x);
         var offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * 0.8f;
 
-        weaponFirePoint.transform.position = transform.position;
-        weaponFirePoint.transform.rotation = Quaternion.LookRotation(Vector3.forward, newFacing);
-        weaponFirePoint.transform.position += offset;
+        //weaponFirePoint.transform.position = transform.position;
+        //weaponFirePoint.transform.rotation = Quaternion.LookRotation(Vector3.forward, newFacing);
+        //weaponFirePoint.transform.position += offset;
 
         var weaponOffset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * 0.2f;
         float weaponDirectionMod = Mathf.Sign(newFacing.x);
 
-        weaponObject.transform.position = transform.position;
-        weaponObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, new Vector2(weaponDirectionMod * -1 * newFacing.y, weaponDirectionMod * newFacing.x));
-        weaponObject.GetComponent<SpriteRenderer>().flipX = Math.Sign(newFacing.x) == 1 ? false : true;
-        weaponObject.transform.position += weaponOffset;
+        //weaponObject.transform.position = transform.position;
+        //weaponObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, new Vector2(weaponDirectionMod * -1 * newFacing.y, weaponDirectionMod * newFacing.x));
+        //weaponObject.GetComponent<SpriteRenderer>().flipX = Math.Sign(newFacing.x) == 1 ? false : true;
+        //weaponObject.transform.position += weaponOffset;
 
         float dirX = Mathf.Sign(newFacing.x);
         recoilVector = Vector3.Cross(newFacing, (dirX == -1) ? Vector3.forward : Vector3.back).normalized;
