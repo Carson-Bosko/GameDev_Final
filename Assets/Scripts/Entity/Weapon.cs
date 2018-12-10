@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour {
 
+    private GameObject weaponFirePoint;
+    private AudioSource audio;
+
     int projectileCount = 0;
 
     public int maxAmmo = 10;
@@ -17,11 +20,11 @@ public class Weapon : MonoBehaviour {
 
     bool shooting = false;
     bool readyToFire = false;
-    float fireRate = .05f;
+    public float fireRate = .7f;
     float timeFromLastFire;
 
-    float damage = 10;
-    bool bulletDrop = true;
+    public float damage = 40;
+    public bool bulletDrop = true;
 
     float recoilValue = 5.0f;
 
@@ -35,10 +38,24 @@ public class Weapon : MonoBehaviour {
         set { recoilValue = value; }
     }
 
+    public int Ammo {
+        get { return currentAmmo; }
+    }
+
+    private void Awake() {
+        foreach (Transform t in transform) {
+            if (t.name == "WeaponFirePoint") {
+                weaponFirePoint = t.gameObject;
+            }
+        }
+        audio = gameObject.GetComponent<AudioSource>();
+    }
+
     void Start() {
         readyToFire = true;
         currentSpread = minSpread;
     }
+
 
     void Update() {
         ////if (shooting) {
@@ -74,12 +91,13 @@ public class Weapon : MonoBehaviour {
         isReloading = false;
     }
 
-    public void Shoot(Entity owner, Vector3 startingPosition, Vector2 startingFacing) {
+    public void Shoot(Entity owner, Vector2 startingFacing) {
         if (readyToFire) {
+            audio.Play();
             GameObject bullet = new GameObject("Bullet");
             Destroy(bullet, 10.0f);
 
-            bullet.transform.position = startingPosition;
+            bullet.transform.position = weaponFirePoint.transform.position;
             float angle = Mathf.Atan2(startingFacing.y, startingFacing.x) * Mathf.Rad2Deg;
             currentSpread = Random.Range(minSpread, maxSpread);
             angle += Random.Range(-currentSpread, currentSpread);

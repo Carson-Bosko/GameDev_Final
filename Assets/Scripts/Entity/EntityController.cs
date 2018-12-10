@@ -232,14 +232,14 @@ public class EntityController : MonoBehaviour {
         Debug.DrawRay(raycastOrigins.bottomRight, Vector2.down * 0.5f, Color.blue);
         RaycastHit2D hitLeft = Physics2D.Raycast(raycastOrigins.bottomLeft, Vector2.down, 0.5f, collisionMask);
         if (hitLeft.collider != null && hitLeft.transform.gameObject.layer == LayerMask.NameToLayer("Stairs")) {
-            Debug.Log("on stairs LEft");
+            //Debug.Log("on stairs LEft");
             collisions.onStairs = true;
         }
         else {
             RaycastHit2D hitRight = Physics2D.Raycast(raycastOrigins.bottomRight, Vector2.down, 0.5f, collisionMask);
             if (hitRight.collider != null && hitRight.transform.gameObject.layer == LayerMask.NameToLayer("Stairs")) {
                 collisions.onStairs = true;
-                Debug.Log("on stairs RIght");
+                //Debug.Log("on stairs RIght");
             }
         }
     }

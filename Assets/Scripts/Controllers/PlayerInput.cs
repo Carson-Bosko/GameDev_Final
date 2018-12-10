@@ -24,7 +24,7 @@ public class PlayerInput : MonoBehaviour {
 
         entity.CheckVerticalInput(Input.GetKey(KeyCode.LeftShift));
 
-        entity.SetAiming(Input.GetKey(KeyCode.Mouse1));
+        //entity.SetAiming(Input.GetKey(KeyCode.Mouse1));
         if (Input.GetKey(KeyCode.Mouse0)) {
             entity.Weapon.Shooting = true;
             entity.Shoot();
@@ -32,10 +32,18 @@ public class PlayerInput : MonoBehaviour {
             entity.Weapon.Shooting = false;
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            entity.switchWeapon(1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            entity.switchWeapon(2);
+        }
+
         if (Input.GetKey(KeyCode.S)) {
-            entity.EnterCover();
+            //entity.EnterCover();
         }else {
-            entity.ExitCover();
+            //entity.ExitCover();
         }
     }
 }

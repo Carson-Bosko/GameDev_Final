@@ -10,6 +10,11 @@ public class ProjectileData : MonoBehaviour {
     private float damage;
     private bool bulletDrop;
 
+    public float Damage {
+        get { return damage; }
+        set { damage = value; }
+    }
+
     void Start() {
         rb2d = GetComponent<Rigidbody2D>();
     }

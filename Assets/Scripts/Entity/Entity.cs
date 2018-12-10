@@ -11,11 +11,12 @@ public class Entity : MonoBehaviour {
     private SpriteRenderer sprtieRenderer;
 
     private float health;
+    public float maxHealth;
     public Action modHealthEvent;
 
-    public Weapon weapon;
-    public GameObject weaponFirePoint;
-    public GameObject weaponObject;
+    public Weapon currentWeapon;
+    public Weapon[] weapons;
+    public int weaponIndex = 0;
 
     //public float jumpHeight = 4;
     //public float timeToJumpApex = 0.4f;
@@ -23,9 +24,9 @@ public class Entity : MonoBehaviour {
     //float accelerationTimeGrounded = 0.1f;
     //float jumpVelocity;
 
-    float moveSpeed;
-    float regularMoveSpeed = 6;
-    float aimedMoveSpeed = 2;
+    public float moveSpeed;
+    public float regularMoveSpeed = 6;
+    public float aimedMoveSpeed = 2;
 
     protected Vector2 facing;
     protected float recoilOffset;
@@ -52,8 +53,8 @@ public class Entity : MonoBehaviour {
     }
 
     public Weapon Weapon {
-        get { return weapon; }
-        set { weapon = value; }
+        get { return currentWeapon; }
+        set { currentWeapon = value; }
     }
 
     public bool Attackable {
@@ -61,18 +62,22 @@ public class Entity : MonoBehaviour {
         set { attackable = value; }
     }
 
-    void ModHealthEvent() {
+    public float Health {
+        get { return health; }
+        set { health = value; }
+    }
 
+    void ModHealthEvent() {
     }
 
     void Awake() {
-        foreach (Transform t in transform) {
-            if (t.name == "WeaponFirePoint") {
-                weaponFirePoint = t.gameObject;
-            }
-            else if (t.name == "Weapon") {
-                weaponObject = t.gameObject;
-            }
+        for (int i = 0; i < weapons.Length; i++) {
+            weapons[i] = Instantiate(weapons[i], gameObject.transform);
+            weapons[i].transform.localScale = new Vector3(0, 0, 0);
+        }
+        if (weapons.Length != 0) {
+            currentWeapon = weapons[weaponIndex];
+            switchWeapon(1);
         }
     }
 
@@ -90,10 +95,10 @@ public class Entity : MonoBehaviour {
 
         coverLevel = 0;
 
-        weapon = gameObject.AddComponent<Weapon>();
+        //weapon = gameObject.AddComponent<Weapon>();
         recoilOffset = 0.0f;
 
-        health = 100;
+        maxHealth = health = 100;
     }
 
     public void SetDirectionalInput(Vector2 input) {
@@ -134,6 +139,13 @@ public class Entity : MonoBehaviour {
         controller.Move(velocity * Time.deltaTime);
     }
 
+    public void switchWeapon(int index) {
+        currentWeapon.transform.localScale = new Vector3(0, 0, 0);
+        currentWeapon = weapons[index-1];
+        weaponIndex = index-1;
+        currentWeapon.transform.localScale = new Vector3(1, 1, 1);
+    }
+
     public void modHealth(float mod) {
         health += mod;
     }
@@ -161,6 +173,12 @@ public class Entity : MonoBehaviour {
             coverAvailable = true;
             coverLevel += 1;
         }
+
+        if (other.gameObject.CompareTag("Bullet")) {
+            Debug.Log("ouch");
+            ProjectileData proj = other.gameObject.GetComponent<ProjectileData>();
+            modHealth(proj.GetComponent<ProjectileData>().Damage);
+        }
     }
 
     public void OnTriggerExit2D(Collider2D other) {
@@ -176,8 +194,10 @@ public class Entity : MonoBehaviour {
 
     public void Shoot() {
         if (!inCover) {
-            weapon.Shoot(this, weaponFirePoint.transform.position, facing);
-            recoilOffset += weapon.RecoilValue;
+            if (currentWeapon != null) {
+                currentWeapon.Shoot(this, facing);
+                recoilOffset += currentWeapon.RecoilValue;
+            }
         }
     }
 
@@ -218,7 +238,7 @@ public class Entity : MonoBehaviour {
                 controller.collisionMask |= 1 << LayerMask.NameToLayer("StairsTop");
             }
         }
-        Debug.Log(s);
+        //Debug.Log(s);
     }
 
     public void UpdateFacing(Vector2 newFacing) {
@@ -227,17 +247,15 @@ public class Entity : MonoBehaviour {
         float angle = Mathf.Atan2(newFacing.y, newFacing.x);
         var offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * 0.8f;
 
-        //weaponFirePoint.transform.position = transform.position;
-        //weaponFirePoint.transform.rotation = Quaternion.LookRotation(Vector3.forward, newFacing);
-        //weaponFirePoint.transform.position += offset;
-
-        var weaponOffset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * 0.2f;
+        var weaponOffset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * 0.5f;
         float weaponDirectionMod = Mathf.Sign(newFacing.x);
 
-        //weaponObject.transform.position = transform.position;
-        //weaponObject.transform.rotation = Quaternion.LookRotation(Vector3.forward, new Vector2(weaponDirectionMod * -1 * newFacing.y, weaponDirectionMod * newFacing.x));
-        //weaponObject.GetComponent<SpriteRenderer>().flipX = Math.Sign(newFacing.x) == 1 ? false : true;
-        //weaponObject.transform.position += weaponOffset;
+        if (currentWeapon != null) {
+            currentWeapon.transform.position = transform.position;
+            currentWeapon.transform.rotation = Quaternion.LookRotation(Vector3.forward, new Vector2(weaponDirectionMod * -1 * newFacing.y, weaponDirectionMod * newFacing.x));
+            currentWeapon.GetComponent<SpriteRenderer>().flipX = Math.Sign(newFacing.x) == 1 ? false : true;
+            currentWeapon.transform.position += weaponOffset;
+        }
 
         float dirX = Mathf.Sign(newFacing.x);
         recoilVector = Vector3.Cross(newFacing, (dirX == -1) ? Vector3.forward : Vector3.back).normalized;
